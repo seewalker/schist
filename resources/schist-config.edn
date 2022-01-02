@@ -1,0 +1,57 @@
+{
+ ; instead of a list this should be "application" as keyword
+ :history-logs          {
+                         :bash {
+                                :name   "${user.home}/.bash_history"
+                                :parser "schist.parse.literal" ; you can ommit parser and it will default to "literal"
+                                }
+                         :zsh  {
+                                :name    "${user.home}/.zsh_history"
+                                :parser  "schist.parse.zshDefault"
+                                :enabled false
+                                }
+                         :powershell
+                         {
+                          :name        "${user.home}/.local/share/powershell/PSReadLine/ConsoleHost_history.txt"
+                          }
+                         :sqlite
+                         {
+                                :name        "${user.home}/.sqlite_history"
+                                }
+                         :postgresql {
+                          :name        "${user.home}/.psql_history"
+                          }
+                         :nodejs {
+                                :name        "${user.home}/.node_repl_history"
+                                }
+                         :R
+                         {
+                          :name        "${user.home}/.Rhistory"
+                          }
+                         :ipython
+                               {
+                                :name        "${user.home}/.ipython/profile_default/history.sqlite"
+                                :parser      "schist.parse.ipython"
+                                :enabled     false
+                                }
+                         :schist
+                         {
+                          :name        "${user.home}/schist/history.tsv"
+                          :parser      "schist.parse.schist"
+                          }
+                         }
+ :device-nickname       "personal-laptop"
+ :run-mode              :once                               ; once | daemon
+ :run-mode-settings     {
+                         :continuous {
+                                      :period-unit  :second
+                                      :period-value 5
+                                      }
+                         }
+ :persist-mode          :local                              ; local | s3
+ :persist-mode-settings {
+                         :local {
+                                 :name "${user.home}/.schist.sqlite"
+                                 }
+                         }
+ }
