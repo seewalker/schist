@@ -61,4 +61,6 @@
                                  :name "${user.home}/.schist/history.sqlite"
                                  }
                          }
+
+ :execute-cmd "${SHELL}"
  }

@@ -1,44 +1,107 @@
 (ns schist.db
+  (:require
+    [next.jdbc :as jdbc]
+    [clojure.tools.logging :as log]
+    )
   (import (java.util UUID)))
+
+(defonce format-version 1)                                  ; these three constants could be in the abstraction
+(defonce uuid-length 36)
+
+(defonce trans-type-codes {:create 1 :set-importance 2})
+
+(def ^:private db {:dbtype "sqlite" :dbname "schist.db"})
+(def ^:private datasource (jdbc/get-datasource db))
 
 ; might as well "create table if not exists".
 ; should this namespace own the connection? should it be in the class scope?
 ; I should make storage abstract to accomodate the "managed-schist" in the future.
 
-(defonce format-version 1)                                  ; these three constants could be in the abstraction
-(defonce uuid-length 36)
-(defonce max-app-length 128)
+; this will be in the abstraction "what is the latest save?"
+(defonce latest-command "SELECT max(datetime(trans.utc_datetime)) FROM command_transaction trans INNER JOIN command cmd ON (trans.command_id = cmd.id) WHERE cmd.app = ? AND trans.type = ?")
+(defonce latest-command-result (keyword "max(datetime(utc_datetime))")) ; in lockstep with the select above
+(defn latest-save [app]
+  (try
+    (get (jdbc/execute-one! datasource [latest-command app]) latest-command-result)
+    (catch Exception ex
+      (log/error ex "Failed to retrieve ")
+      nil
+      ))
+  )
 
 ; sqlite doesn't have datetime as a storage thing, so it will be just text in the creation.
 ; app can be string, instead of a different table, because that level of abstraction not needed
 ; so far, and string will be easier to merge.
-(defonce command-table-creation
-         (format
-           "CREATE TABLE IF NOT EXISTS command (
-          id varchar(%s),
-          app varchar(%s),
-          cmd TEXT,
-          time-lower-bound TEXT,
-          time-upper-bound TEXT,
-          format-version INTEGER
-          )"
-           uuid-length
-           max-app-length,
-           format-version
-           )
+(defonce ^:private db-creation-statements
+         [
+          (format
+            "CREATE TABLE IF NOT EXISTS command (
+              id varchar(%s) PRIMARY KEY,
+              app TEXT,
+              cmd TEXT,
+              lower_bound_utc_datetime TEXT,
+              upper_bound_utc_datetime TEXT,
+              format_version INTEGER
+            )"
+            uuid-length
+            )
+          (format
+            "CREATE TABLE IF NOT EXISTS command_transaction (
+              id varchar(%s) PRIMARY KEY,
+              app TEXT,
+              command_id varchar(%s) FOREIGN KEY REFERENCES command(id),
+              type INTEGER,
+              utc_datetime TEXT,
+              format_version INTEGER
+            )"
+            uuid-length
+            )
+          (format
+            "CREATE TABLE IF NOT EXISTS command_metadata(
+              id varchar(%s) PRIMARY KEY,
+              comment TEXT,
+              importance_indicator INTEGER,
+              format_version INTEGER
+            )"
+            uuid-length
+            )
+          "CREATE INDEX IF NOT EXISTS search_index ON command(cmd, app)"
+          "CREATE INDEX IF NOT EXISTS upper_bound_index ON command_transaction(utc_datetime)"
+          ]
          )
 
 ; this will be an implementation of something abstract
 ; what's currently here will be in a "let" binding where the body is jdbc stuff.
-(defn create-entry [app cmd-txt db-config]
-  {:id  (.toString (UUID/randomUUID))
-   :app app
-   :cmt cmt-txt
-   :time-lower-bound nil
-   :time-upper-bound nil
-   :format-version format-version
-   }
+(defn save-command [app cmd-txt raw-lower-bound upper-bound]
+  (let [cmd-uuid (.toString (UUID/randomUUID))
+        trans-uuid (.toString (UUID/randomUUID))
+        lower-bound (if (nil? raw-lower-bound) (latest-save app) raw-lower-bound)]
+    {:command
+     {:id                       cmd-uuid
+      :app                      app
+      :cmd                      cmd-txt
+      :lower_bound_utc_datetime lower-bound
+      :upper_bound_utc_datetime upper-bound
+      :format_version           format-version
+      }
+     :command_transaction
+     {
+      :id             trans-uuid
+      :command_id     cmd-uuid
+      :app            app
+      :type           (:create trans-type-codes)
+      :format_version format-version
+      }
+     })
   )
+
+(defn save-records [app cmd-records]
+  (jdbc/execute-batch! ds )
+  )
+
+
+
+
 
 ; does look like next-jdbc can work with sqlite : https://github.com/seancorfield/next-jdbc/blob/develop/src/next/jdbc/connection.clj
 ; https://github.com/xerial/sqlite-jdbc

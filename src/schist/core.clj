@@ -17,6 +17,9 @@
 (defn schist-annotate [args]
   (log/info args))
 
+(defonce user-timezone
+         (System/getProperty "user.timezone"))
+
 (defonce app-opt
          {:as      "app"
           :option  "app"
@@ -49,9 +52,18 @@
           :description "Maintain shell/repl history"
           :version     "0.0.1"                              ; can I get this from project.clj?
           :subcommands [
+                        ; start by implementing this, before worrying about repeated mode.
+                        {
+                         :command     "sync"
+                         :description "Runs a one-time sync of the history logs of monitored apps to the database"
+                         :opts        [
+                                       ; if empty, ommit?
+                                       ]
+                         :runs        schist-sync
+                         }
                         {
                          :command     "search"
-                         :description "Searches history for given app for a given command"
+                         :description "Searches history for given app with a query. Time-related information given in user timezone."
                          :opts        [
                                        app-opt
                                        profile-opt
@@ -105,14 +117,7 @@
                                        ]
                          :runs        schist-start
                          }
-                        {
-                         :command     "sync"
-                         :description "Runs a one-time (as opposed to continuously running in the background) sync of the monitored logs"
-                         :opts        [
-                                       ; if empty, ommit?
-                                       ]
-                         :runs        schist-sync
-                         }
+
                         ]
           }
          )
