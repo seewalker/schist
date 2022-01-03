@@ -1,46 +1,52 @@
 {
  ; instead of a list this should be "application" as keyword
  :history-logs          {
-                         :bash {
-                                :name   "${user.home}/.bash_history"
-                                :parser "schist.parse.literal" ; you can ommit parser and it will default to "literal"
-                                }
-                         :zsh  {
-                                :name    "${user.home}/.zsh_history"
-                                :parser  "schist.parse.zshDefault"
-                                :enabled false
-                                }
+                         :bash       {
+                                      :name   "${user.home}/.bash_history"
+                                      :parser "schist.parse.literal" ; you can ommit parser and it will default to "literal"
+                                      }
+                         :zsh        {
+                                      :name    "${user.home}/.zsh_history"
+                                      :parser  "schist.parse.zshDefault"
+                                      :enabled false
+                                      }
+                         ; no regular command prompt for windows : not persisted.
                          :powershell
-                         {
-                          :name        "${user.home}/.local/share/powershell/PSReadLine/ConsoleHost_history.txt"
-                          }
+                                     {
+                                      :name "${user.home}/.local/share/powershell/PSReadLine/ConsoleHost_history.txt"
+                                      }
                          :sqlite
-                         {
-                                :name        "${user.home}/.sqlite_history"
-                                }
+                                     {
+                                      :name "${user.home}/.sqlite_history"
+                                      }
                          :postgresql {
-                          :name        "${user.home}/.psql_history"
-                          }
-                         :nodejs {
-                                :name        "${user.home}/.node_repl_history"
-                                }
+                                      :name "${user.home}/.psql_history"
+                                      }
+                         :nodejs     {
+                                      :name "${user.home}/.node_repl_history"
+                                      }
                          :R
-                         {
-                          :name        "${user.home}/.Rhistory"
-                          }
+                                     {
+                                      :name "${user.home}/.Rhistory"
+                                      }
+                         :lua        {
+                                      :name "${user.home}/.luahistory"
+                                      }
                          :ipython
-                               {
-                                :name        "${user.home}/.ipython/profile_default/history.sqlite"
-                                :parser      "schist.parse.ipython"
-                                :enabled     false
-                                }
+                                     {
+                                      :name    "${user.home}/.ipython/profile_default/history.sqlite"
+                                      :parser  "schist.parse.ipython"
+                                      :enabled false
+                                      }
                          :schist
-                         {
-                          :name        "${user.home}/schist/history.tsv"
-                          :parser      "schist.parse.schist"
-                          }
+                                     {
+                                      :name         "${user.home}/schist/history.tsv"
+                                      :parser       "schist.parse.schist"
+                                      :interop-mode :selfish ; This overrides the default ":respectful" interop-mode.
+                                      }
                          }
  :device-nickname       "personal-laptop"
+ ; starting to think run-mode isn't configuration, it's part of the CLI. But brehavior if daemon is configuration.
  :run-mode              :once                               ; once | daemon
  :run-mode-settings     {
                          :continuous {
@@ -48,10 +54,11 @@
                                       :period-value 5
                                       }
                          }
- :persist-mode          :local                              ; local | s3
+ ; schist-managed will redirect to local, until it's implemented. Only implement if enough people like this software.
+ :persist-mode          [:local]                            ; options : local | schist-managed
  :persist-mode-settings {
                          :local {
-                                 :name "${user.home}/.schist.sqlite"
+                                 :name "${user.home}/.schist/history.sqlite"
                                  }
                          }
  }

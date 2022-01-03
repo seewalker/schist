@@ -1,32 +1,10 @@
 (ns schist.core
   (:require
     [clojure.tools.logging :as log]
-    [clojure.java.io :as io]
-    [clojure.edn :as edn]
+    [schist.config :refer [load-config]]
+    [schist.daemon :refer [schist-start]]
     [cli-matic.core :refer [run-cmd]])
-  (:gen-class)
-  (:import (java.io IOException PushbackReader)))
-
-(defonce home (System/getProperty "user.home"))
-(defonce schist-dir ".schist")
-; this will go to a separate "config" ns where the overall object is the only export.
-(def ^:private config-name "config.edn")
-
-(defn load-config []
-  (let [config-path (io/file home schist-dir config-name)]
-    (try
-      (with-open [r (io/reader config-path)]
-        (edn/read (PushbackReader. r)))
-      (catch IOException ex
-        (log/errorf ex "Could not load configuration at %s" config-path)
-        )
-      ))
-  )
-
-; replace all system properties in history-logs.name
-(defn process-config [config]
-  nil
-  )
+  (:gen-class))
 
 (defn schist-sync [args]
   (log/info args))
@@ -38,13 +16,6 @@
   (log/info args))
 (defn schist-annotate [args]
   (log/info args))
-(defn schist-start [args]
-  (log/info args))
-(defn schist-stop [args]
-  (log/info args))
-(defn schist-restart [args]
-  (log/info args))
-
 
 (defonce app-opt
          {:as      "app"
@@ -71,6 +42,7 @@
           :type    :int
           })
 
+; Will keep this pretty minimalistic. Features like ""
 (defonce cli-api
          {
           :command     "schist"
@@ -83,6 +55,7 @@
                          :opts        [
                                        app-opt
                                        profile-opt
+                                       ; maybe an option for filter by only successful commands
                                        ]
                          :runs        schist-search
                          }
@@ -103,7 +76,7 @@
                          }
                         {
                          :command     "load"
-                         :description "Loads a file into the history for a given app"
+                         :description "Loads a file into the history for a given app (using the log format of that app)"
                          :opts        [
                                        app-opt
                                        ]
@@ -123,6 +96,7 @@
                                        ]
                          :runs        schist-annotate
                          }
+                        ; maybe an "execute" command that runs something in the system shell.
                         {
                          :command     "start"
                          :description "Starts schist sync in the background continuously"
@@ -132,22 +106,6 @@
                          :runs        schist-start
                          }
                         {
-                         :command     "stop"
-                         :description "Stops schist if it is running in the background"
-                         :opts        [
-                                       port-opt
-                                       ]
-                         :runs        schist-stop
-                         }
-                        {
-                         :command     "restart"
-                         :description "Restarts schist"
-                         :opts        [
-                                       port-opt
-                                       ]
-                         :runs        schist-restart
-                         }
-                        {
                          :command     "sync"
                          :description "Runs a one-time (as opposed to continuously running in the background) sync of the monitored logs"
                          :opts        [
@@ -155,13 +113,13 @@
                                        ]
                          :runs        schist-sync
                          }
-
                         ]
           }
          )
 
 (defn -main [& args]
   (let [config (load-config)]
+    (log/info config)
     (run-cmd args cli-api)
     )
   )
