@@ -126,7 +126,7 @@
 
 (defn -main [& args]
   (let [config (load-config)]
-    (log/info config)
+    (log/debug config)
     (run-cmd args cli-api)
     )
   )
