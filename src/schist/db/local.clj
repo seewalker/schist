@@ -1,4 +1,4 @@
-(ns schist.db
+(ns schist.db.local
   (:require
     [next.jdbc :as jdbc]
     [clojure.tools.logging :as log]
@@ -20,14 +20,6 @@
 ; this will be in the abstraction "what is the latest save?"
 (defonce latest-command "SELECT max(datetime(trans.utc_datetime)) FROM command_transaction trans INNER JOIN command cmd ON (trans.command_id = cmd.id) WHERE cmd.app = ? AND trans.type = ?")
 (defonce latest-command-result (keyword "max(datetime(utc_datetime))")) ; in lockstep with the select above
-(defn latest-save [app]
-  (try
-    (get (jdbc/execute-one! datasource [latest-command app]) latest-command-result)
-    (catch Exception ex
-      (log/error ex "Failed to retrieve ")
-      nil
-      ))
-  )
 
 ; sqlite doesn't have datetime as a storage thing, so it will be just text in the creation.
 ; app can be string, instead of a different table, because that level of abstraction not needed
@@ -70,8 +62,16 @@
           ]
          )
 
-; this will be an implementation of something abstract
-; what's currently here will be in a "let" binding where the body is jdbc stuff.
+; I think this will become a "defmethod" where the dispatch is on :persist-mode
+(defn latest-save [app]
+  (try
+    (get (jdbc/execute-one! datasource [latest-command app]) latest-command-result)
+    (catch Exception ex
+      (log/error ex "Failed to retrieve ")
+      nil
+      )))
+
+; I think this will become a "defmethod" where the dispatch is on :persist-mode
 (defn save-command [app cmd-txt raw-lower-bound upper-bound]
   (let [cmd-uuid (.toString (UUID/randomUUID))
         trans-uuid (.toString (UUID/randomUUID))
@@ -94,6 +94,10 @@
       }
      })
   )
+
+; One point of having this not be done at classload time is somebody may not want to use local storage at all
+; execute the db creation here.
+(defn setup! [] nil)
 
 (defn save-records [app cmd-records]
   (jdbc/execute-batch! ds )

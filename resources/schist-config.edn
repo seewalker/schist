@@ -55,12 +55,12 @@
                                       }
                          }
  ; schist-managed will redirect to local, until it's implemented. Only implement if enough people like this software.
- :persist-mode          [:local]                            ; options : local | schist-managed
+ :persist-mode          :local                              ; options : local | schist-managed
  :persist-mode-settings {
                          :local {
                                  :name "${user.home}/.schist/history.sqlite"
                                  }
                          }
 
- :execute-cmd "${SHELL}"
+ :execute-cmd           "${SHELL}"
  }

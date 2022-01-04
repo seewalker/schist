@@ -1,4 +1,6 @@
 (ns schist.core
+  ^{:doc "Command-line entrypoint with the CLI API specification"
+    :author "Alex Seewald"}
   (:require
     [clojure.tools.logging :as log]
     [schist.config :refer [load-config]]

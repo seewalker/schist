@@ -1,6 +1,7 @@
 (ns schist.parse.literal
   (:import (schist.parse.common HistLogParser)))
 
+; Can I spec this? That may provide the feeling of missing types I'm having.
 (defrecord LiteralHistLogParser []
   HistLogParser
   ; at this point we definitiely have a non-empty string as "log" because any error handling is common

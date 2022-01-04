@@ -1,0 +1,1 @@
+(ns schist.db.managed)
