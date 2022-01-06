@@ -7,6 +7,8 @@
                  [org.clojure/clojure "1.10.3"]             ; or 1.10.3 since the jdbc made this download?
                  [org.clojure/tools.logging "1.2.3"]
                  [ch.qos.logback/logback-classic "1.2.3"]
+                 [org.clojure/core.async "1.5.648"]
+                 [instaparse "1.4.10"]
                  [cli-matic "0.4.3"]
                  [com.github.seancorfield/next.jdbc "1.2.761"]
                  [org.xerial/sqlite-jdbc "3.36.0.3"]

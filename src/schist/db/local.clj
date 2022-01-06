@@ -5,9 +5,9 @@
     )
   (import (java.util UUID)))
 
-(defonce format-version 1)                                  ; these three constants could be in the abstraction
+; shoulc I commit to
+(defonce format-version 1)
 (defonce uuid-length 36)
-
 (defonce trans-type-codes {:create 1 :set-importance 2})
 
 (def ^:private db {:dbtype "sqlite" :dbname "schist.db"})
@@ -33,7 +33,9 @@
               cmd TEXT,
               lower_bound_utc_datetime TEXT,
               upper_bound_utc_datetime TEXT,
-              format_version INTEGER
+              device-nickname TEXT,
+              format_version INTEGER,
+              estimated-genuine INTEGER
             )"
             uuid-length
             )
@@ -42,6 +44,7 @@
               id varchar(%s) PRIMARY KEY,
               app TEXT,
               command_id varchar(%s) FOREIGN KEY REFERENCES command(id),
+              batch_id INTEGER,
               type INTEGER,
               utc_datetime TEXT,
               format_version INTEGER
@@ -52,6 +55,7 @@
             "CREATE TABLE IF NOT EXISTS command_metadata(
               id varchar(%s) PRIMARY KEY,
               comment TEXT,
+              command_id varchar(%s) FOREIGN KEY REFERENCES command(id),
               importance_indicator INTEGER,
               format_version INTEGER
             )"
@@ -68,7 +72,7 @@
     (get (jdbc/execute-one! datasource [latest-command app]) latest-command-result)
     (catch Exception ex
       (log/error ex "Failed to retrieve ")
-      nil
+      nil                                                   ; is this already implicit
       )))
 
 ; I think this will become a "defmethod" where the dispatch is on :persist-mode

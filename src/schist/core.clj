@@ -5,6 +5,7 @@
     [clojure.tools.logging :as log]
     [schist.config :refer [load-config]]
     [schist.daemon :refer [schist-start]]
+    [schist.history :refer [save-schist-command]]
     [cli-matic.core :refer [run-cmd]])
   (:gen-class))
 
@@ -124,9 +125,11 @@
           }
          )
 
+
 (defn -main [& args]
   (let [config (load-config)]
     (log/debug config)
     (run-cmd args cli-api)
+    (save-schist-command args)
     )
   )

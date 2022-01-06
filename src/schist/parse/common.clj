@@ -18,6 +18,7 @@
   (lower-bound [entry])
   (upper-bound [entry])
   (command [entry])
+  (app-metadata [entry])
   )
 
 (defn unspecified-upper-bound []
