@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: com.github.seancorfield/expectations:2.0.143">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/github/seancorfield/expectations/2.0.143/expectations-2.0.143.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

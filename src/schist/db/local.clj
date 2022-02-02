@@ -104,7 +104,7 @@
 (defn setup! [] nil)
 
 (defn save-records [app cmd-records]
-  (jdbc/execute-batch! ds )
+  (jdbc/execute-batch! ds)
   )
 
 

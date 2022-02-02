@@ -29,4 +29,5 @@
   :repl-options {:init-ns schist.core}
   :main schist.core
   :jvm-opts ["-Dclojure.tools.logging.factory=clojure.tools.logging.impl/slf4j-factory"]
+  :aot [schist.exception.ConfigException]
   )

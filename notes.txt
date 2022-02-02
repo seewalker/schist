@@ -1,0 +1,31 @@
+lein test schist.config-test
+
+Needed to put exception class made with :gen-class into the "aot" section of project.clj for it to get compiled and
+accessible to import.
+
+Using the "run with intellij classpath" test runner configuration works when "test" profile is added through the cursive leiningen window (righthand side).
+    However, I added this unconditionally, leading to "test" libs being require-able at main time. This is not the case with regular lein command line runs,
+    where profiles are better understood. I can live with this state of affairs for now.
+
+
+(require '[clojure.spec.alpha :as s])
+
+
+(s/def :x/r string?)
+    good
+(s/def ::r string?)
+    good
+(s/def :r string?)
+    bad - what is the difference from two above?
+    I think the reason is to be used with spec keywords have to be fully-qualified. a regular keyword like ":k" isn't. "::k" means 'in the current namespace'
+    or ":other-namespace/k" means in that namespace.
+
+
+
+(map (fn [x] (async/thread (println (:id (bean (Thread/currentThread)))))) (range 10))
+
+    really does run stuff in different threads, by default in the same one each time when enough pause in the REPL to make things finish.
+    meaning it's using a pretty good thread pool internally.
+
+
+I do think specter is the way to go, no native idea of "mapping over maps". borkdude approved.

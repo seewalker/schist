@@ -5,18 +5,17 @@
     [schist.config :refer [create-schist-file]]
     [clojure.tools.logging :as log]
     [clojure.java.io :as io]
-    [clojure.edn :as edn]
     )
-  (:import (java.io IOException PushbackWriter))
+  (:import (java.io IOException))
   )
 
 ;
 (defn save-schist-command
   [cmd]
-  (let [history-path (create-schist-file "history.edn")]
+  (let [history-path (create-schist-file "history")]
     (try
-      (with-open [w (io/writer config-path :append true)]
-        (edn/write (PushbackWriter. w)))
+      (with-open [w (io/writer history-path :append true)]
+        (.write w cmd))
       (catch IOException ex
-        (log/errorf ex "Could not load configuration at %s" config-path)
+        (log/errorf ex "Could not write schist command history to %s" history-path)
         (throw ex)))))

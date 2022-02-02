@@ -1,0 +1,8 @@
+{
+ ; instead of a list this should be "application" as keyword
+ ; It will simplify things for there not to be a CLI for enabling/disabling things
+ :history-logs          {
+                         :bash       {
+                                      :name   "${user.home}/.bash_history"
+                                      :parser "schist.parse.literal" ; you can ommit parser and it will default to "literal"
+                                              }

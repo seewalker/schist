@@ -1,0 +1,99 @@
+{
+ ; instead of a list this should be "application" as keyword
+ ; It will simplify things for there not to be a CLI for enabling/disabling things
+ :history-logs          {
+                         :bash       {
+                                      :name   "${user.home}/.bash_history"
+                                      :parser "schist.parse.literal" ; you can ommit parser and it will default to "literal"
+                                      :genuine-history-estimation
+                                              {
+                                               :minimum-common-substring
+                                               {
+                                                 ; parameters for some function having sensitivity to overal size of log
+                                                ; should sketch out what that function would be on pen and paper
+                                                }
+                                               :max-volume
+                                               {
+                                                ; similar to above, need to pen and paper this.
+                                                ; probably in terms of percentile
+                                               }
+                                               ; anything which is not considered "genuine" can be kept in a buffer for
+                                               ; manual review.
+                                               ; also let's keep transaction grouping info around for awhile
+                                              }
+                                      }
+                         :zsh        {
+                                      :name    "${user.home}/.zsh_history"
+                                      :parser  :line-based  ;
+                                      :enabled false
+                                      }
+                         ; no regular command prompt for windows : not persisted.
+                         :powershell
+                                     {
+                                      :name "${user.home}/.local/share/powershell/PSReadLine/ConsoleHost_history.txt"
+                                      :enabled false
+                                      }
+                         :fish
+                                     {
+                                      :name "${user.home}/.local/share/fish/fish_history"
+                                      :enabled false
+                                      }
+                         :sqlite
+                                     {
+                                      :name "${user.home}/.sqlite_history"
+                                      :enabled false
+                                      }
+                         :postgresql {
+                                      :name "${user.home}/.psql_history"
+                                      :enabled false
+                                      }
+                         :nodejs     {
+                                      :name "${user.home}/.node_repl_history"
+                                      :enabled false
+                                      }
+                         :R
+                                     {
+                                      :name "${user.home}/.Rhistory"
+                                      :enabled false
+                                      }
+                         :lua        {
+                                      :name "${user.home}/.luahistory"
+                                      :enabled false
+                                      }
+                         :ipython
+                                     {
+                                      :name    "${user.home}/.ipython/profile_default/history.sqlite"
+                                      :parser  "schist.parse.ipython"
+                                      :enabled false
+                                      }
+                         :ghci
+                                     {
+                                      :name "${user.home}/.ghc/ghci_history"
+                                      :enabled false
+                                      }
+                         :schist
+                                     {
+                                      :name         "${user.home}/schist/history.tsv"
+                                      :parser       "schist.parse.schist"
+                                      :interop-mode :selfish ; This overrides the default ":respectful" interop-mode.
+                                      }
+                         }
+ :device-nickname       "test-device"
+ ; starting to think run-mode isn't configuration, it's part of the CLI. But brehavior if daemon is configuration.
+ :run-mode-settings     {
+                         :continuous {
+                                      :period-unit  :second
+                                      :period-value 5
+                                      }
+                         }
+ ; schist-managed will redirect to local, until it's implemented. Only implement if enough people like this software.
+ :persist-mode          :local                              ; options : local | schist-managed
+ :persist-mode-settings {
+                         :local {
+                                 :db-path "${user.home}/.schist/history.sqlite"
+                                 }
+                         }
+
+ :execute-cmd           "${SHELL}"
+ :transaction-retention-days 6
+ }
